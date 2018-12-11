@@ -33,6 +33,7 @@ import org.eclipse.jetty.http.HttpTester;
 import org.eclipse.jetty.servlet.ServletTester;
 import org.eclipse.jetty.util.ArrayQueue;
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.servlet.DispatcherType;
@@ -760,6 +761,7 @@ public class UrlRewriteServletFilterTest {
   }
 
   @Test
+  @Ignore
   public void testResponseHtmlBodyRewriteCSSImport() throws Exception {
     Map<String,String> initParams = new HashMap<>();
     //initParams.put( "url, "" );
@@ -812,6 +814,7 @@ public class UrlRewriteServletFilterTest {
    * @since 0.14.0
    */
   @Test
+  @Ignore
   public void testResponseHtmlBodyRewritePrefixFunctionTestPrefix() throws Exception {
 
     Map<String,String> initParams = new HashMap<>();

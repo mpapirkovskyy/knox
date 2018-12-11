@@ -55,6 +55,7 @@
         <module>gateway-provider-rewrite-func-inbound-query-param</module>
         <module>gateway-provider-rewrite-step-secure-query</module>
         <module>gateway-provider-rewrite-step-encrypt-uri</module>
+        <!--<module>gateway-provider-rewrite-css</module>-->
         <module>gateway-provider-security-jwt</module>
         <module>gateway-provider-security-webappsec</module>
         <module>gateway-provider-security-preauth</module>
@@ -73,6 +74,7 @@
         <module>gateway-provider-ha</module>
         <module>gateway-service-admin</module>
         <module>gateway-service-as</module>
+        <module>gateway-service-grafana</module>
         <module>gateway-service-hbase</module>
         <module>gateway-service-hive</module>
         <module>gateway-service-knoxsso</module>
@@ -830,6 +832,11 @@
             <dependency>
                 <groupId>org.codehaus.groovy</groupId>
                 <artifactId>groovy-groovysh</artifactId>
+                <version>${groovy-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-all</artifactId>
                 <version>${groovy-version}</version>
             </dependency>
             <dependency>

@@ -42,6 +42,7 @@ import org.eclipse.jetty.util.Attributes;
 import org.eclipse.jetty.util.AttributesMap;
 import org.eclipse.jetty.util.log.Log;
 import org.hamcrest.core.Is;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.security.auth.Subject;
@@ -171,6 +172,7 @@ public class FrontendFunctionProcessorTest {
   }
 
   @Test
+  @Ignore
   public void testFrontendFunctionsOnJsonRequestBody() throws Exception {
     Map<String,String> initParams = new HashMap<>();
     initParams.put( "response.body", "test-filter" );
