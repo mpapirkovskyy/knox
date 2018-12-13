@@ -29,6 +29,12 @@
             <rewrite apply="GRAFANA/grafana/outbound/basepath" to="response.body"/>
             <rewrite apply="GRAFANA/grafana/outbound/filter/headers" to="response.headers"/>
         </route>
+
+        <route path="/grafana/**?**">
+            <rewrite apply="GRAFANA/grafana/inbound/query-other" to="request.url"/>
+            <rewrite apply="GRAFANA/grafana/outbound/basepath" to="response.body"/>
+            <rewrite apply="GRAFANA/grafana/outbound/filter/headers" to="response.headers"/>
+        </route>
     </routes>
 
     <dispatch classname="org.apache.knox.gateway.grafana.GrafanaDispatch"/>
