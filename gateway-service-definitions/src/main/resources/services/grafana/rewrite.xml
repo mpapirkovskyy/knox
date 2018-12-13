@@ -35,4 +35,13 @@
         <rewrite template='{$frontend[path]}/grafana/login'/>
     </rule>
 
+    <rule dir="OUT" name="GRAFANA/grafana/outbound/logout">
+        <rewrite template='/"'/>
+    </rule>
+
+    <filter name="GRAFANA/grafana/outbound/basepath">
+        <content type="text/html">
+            <apply path="/logout&quot;" rule="GRAFANA/grafana/outbound/logout"/>
+        </content>
+    </filter>>
 </rules>

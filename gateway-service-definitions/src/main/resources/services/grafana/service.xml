@@ -21,19 +21,16 @@
         <route path="/grafana">
             <rewrite apply="GRAFANA/grafana/inbound/main" to="request.url"/>
             <rewrite apply="GRAFANA/grafana/outbound/basepath" to="response.body"/>
-            <rewrite apply="GRAFANA/grafana/outbound/filter/headers" to="response.headers"/>
         </route>
 
         <route path="/grafana/**">
             <rewrite apply="GRAFANA/grafana/inbound/root1" to="request.url"/>
             <rewrite apply="GRAFANA/grafana/outbound/basepath" to="response.body"/>
-            <rewrite apply="GRAFANA/grafana/outbound/filter/headers" to="response.headers"/>
         </route>
 
         <route path="/grafana/**?**">
             <rewrite apply="GRAFANA/grafana/inbound/query-other" to="request.url"/>
             <rewrite apply="GRAFANA/grafana/outbound/basepath" to="response.body"/>
-            <rewrite apply="GRAFANA/grafana/outbound/filter/headers" to="response.headers"/>
         </route>
     </routes>
 
