@@ -17,7 +17,11 @@
  */
 package org.apache.knox.gateway.service.definition;
 
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlType(name = "dispatch")
@@ -34,6 +38,8 @@ public class CustomDispatch {
   private String httpClientFactory;
 
   private boolean useTwoWaySsl = false;
+
+  private List<CustomDispatchProperty> properties;
 
   @XmlAttribute(name = "contributor-name")
   public String getContributorName() {
@@ -92,5 +98,15 @@ public class CustomDispatch {
   /* this is used when we use Apache Commons Digestor bindings, see KnoxFormatXmlTopologyRules.configure() */
   public void setUseTwoWaySsl(String useTwoWaySsl) {
     this.useTwoWaySsl = Boolean.parseBoolean(useTwoWaySsl);
+  }
+
+  @XmlElement(name = "property")
+  @XmlElementWrapper(name = "properties")
+  public List<CustomDispatchProperty> getProperties() {
+    return properties;
+  }
+
+  public void setProperties(List<CustomDispatchProperty> properties) {
+    this.properties = properties;
   }
 }

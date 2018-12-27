@@ -17,6 +17,7 @@
  */
 package org.apache.knox.gateway.deploy.impl;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.knox.gateway.config.impl.GatewayConfigImpl;
 import org.apache.knox.gateway.deploy.DeploymentContext;
 import org.apache.knox.gateway.deploy.ServiceDeploymentContributorBase;
@@ -28,6 +29,7 @@ import org.apache.knox.gateway.filter.XForwardedHeaderFilter;
 import org.apache.knox.gateway.filter.rewrite.api.CookieScopeServletFilter;
 import org.apache.knox.gateway.filter.rewrite.api.UrlRewriteRulesDescriptor;
 import org.apache.knox.gateway.service.definition.CustomDispatch;
+import org.apache.knox.gateway.service.definition.CustomDispatchProperty;
 import org.apache.knox.gateway.service.definition.Policy;
 import org.apache.knox.gateway.service.definition.Rewrite;
 import org.apache.knox.gateway.service.definition.Route;
@@ -199,11 +201,12 @@ public class ServiceDefinitionDeploymentContributor extends ServiceDeploymentCon
       String haClassName = customDispatch.getHaClassName();
       String httpClientFactory = customDispatch.getHttpClientFactory();
       boolean useTwoWaySsl = customDispatch.getUseTwoWaySsl();
+      List<CustomDispatchProperty> properties = customDispatch.getProperties();
       if ( isHaEnabled) {
         if (haContributorName != null) {
           addDispatchFilter(context, service, resource, DISPATCH_ROLE, haContributorName);
         } else if (haClassName != null) {
-          addDispatchFilterForClass(context, service, resource, haClassName, httpClientFactory, useTwoWaySsl);
+          addDispatchFilterForClass(context, service, resource, haClassName, httpClientFactory, useTwoWaySsl, properties);
         } else {
           addDefaultHaDispatchFilter(context, service, resource);
         }
@@ -214,7 +217,7 @@ public class ServiceDefinitionDeploymentContributor extends ServiceDeploymentCon
         } else {
           String className = customDispatch.getClassName();
           if ( className != null ) {
-            addDispatchFilterForClass(context, service, resource, className, httpClientFactory, useTwoWaySsl);
+            addDispatchFilterForClass(context, service, resource, className, httpClientFactory, useTwoWaySsl, properties);
           } else {
             //final fallback to the default dispatch
             addDispatchFilter(context, service, resource, DISPATCH_ROLE, "http-client");
@@ -229,11 +232,14 @@ public class ServiceDefinitionDeploymentContributor extends ServiceDeploymentCon
   }
 
   private void addDefaultHaDispatchFilter(DeploymentContext context, Service service, ResourceDescriptor resource) {
-    FilterDescriptor filter = addDispatchFilterForClass(context, service, resource, DEFAULT_HA_DISPATCH_CLASS, null);
+    FilterDescriptor filter = addDispatchFilterForClass(context, service, resource, DEFAULT_HA_DISPATCH_CLASS, null, null);
     filter.param().name(SERVICE_ROLE_PARAM).value(service.getRole());
   }
 
-  private FilterDescriptor addDispatchFilterForClass(DeploymentContext context, Service service, ResourceDescriptor resource, String dispatchClass, String httpClientFactory, boolean useTwoWaySsl) {
+  private FilterDescriptor addDispatchFilterForClass(DeploymentContext context, Service service,
+                                                     ResourceDescriptor resource, String dispatchClass,
+                                                     String httpClientFactory, boolean useTwoWaySsl,
+                                                     List<CustomDispatchProperty> properties) {
     FilterDescriptor filter = resource.addFilter().name(getName()).role(DISPATCH_ROLE).impl(GatewayDispatchFilter.class);
     filter.param().name(DISPATCH_IMPL_PARAM).value(dispatchClass);
     if (httpClientFactory != null) {
@@ -252,11 +258,18 @@ public class ServiceDefinitionDeploymentContributor extends ServiceDeploymentCon
       //special case for hive
       filter.param().name("basicAuthPreemptive").value("true");
     }
+    if (CollectionUtils.isNotEmpty(properties)) {
+      for (CustomDispatchProperty property : properties) {
+        filter.param().name(property.getName()).value(property.getValue());
+      }
+    }
     return filter;
   }
 
-  private FilterDescriptor addDispatchFilterForClass(DeploymentContext context, Service service, ResourceDescriptor resource, String dispatchClass, String httpClientFactory) {
-    return addDispatchFilterForClass(context, service, resource, dispatchClass, httpClientFactory, false);
+  private FilterDescriptor addDispatchFilterForClass(DeploymentContext context, Service service,
+                                                     ResourceDescriptor resource, String dispatchClass,
+                                                     String httpClientFactory, List<CustomDispatchProperty> properties) {
+    return addDispatchFilterForClass(context, service, resource, dispatchClass, httpClientFactory, false, properties);
   }
 
   private boolean isHaEnabled(DeploymentContext context) {

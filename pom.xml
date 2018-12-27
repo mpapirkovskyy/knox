@@ -98,6 +98,7 @@
         <module>gateway-provider-ha</module>
         <module>gateway-service-admin</module>
         <module>gateway-service-as</module>
+        <module>gateway-auth-proxy-header</module>
         <module>gateway-service-hbase</module>
         <module>gateway-service-hive</module>
         <module>gateway-service-knoxsso</module>
