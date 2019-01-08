@@ -255,4 +255,47 @@ public class ConfigurableDispatchTest {
     assertThat(outboundResponse.getHeader(SET_COOKIE), is("abc"));
     assertThat(outboundResponse.getHeader(WWW_AUTHENTICATE), is("negotiate"));
   }
+
+  @Test( timeout = TestUtils.SHORT_TIMEOUT )
+  public void testEmptyAuthProxyHeaderName() {
+    String testAuthProxyHeaderName = "";
+    ConfigurableDispatch dispatch = EasyMock.partialMockBuilder(ConfigurableDispatch.class)
+        .addMockedMethod("addCredentialsToRequest", HttpUriRequest.class, String.class)
+        .createMock();
+    dispatch.setAuthProxyHeaderName(testAuthProxyHeaderName);
+
+    HttpServletRequest inboundRequest = EasyMock.createNiceMock(HttpServletRequest.class);
+    EasyMock.expect(inboundRequest.getHeaderNames()).andReturn(Collections.emptyEnumeration()).anyTimes();
+
+    HttpUriRequest outboundRequest = new HttpGet();
+
+    EasyMock.replay(inboundRequest, dispatch);
+
+    dispatch.copyRequestHeaderFields(outboundRequest, inboundRequest);
+
+    EasyMock.verify(inboundRequest, dispatch);
+  }
+
+  @Test( timeout = TestUtils.SHORT_TIMEOUT )
+  public void testAuthProxyHeaderName() {
+    String testAuthProxyHeaderName = "testHeader";
+    ConfigurableDispatch dispatch = EasyMock.partialMockBuilder(ConfigurableDispatch.class)
+        .addMockedMethod("addCredentialsToRequest", HttpUriRequest.class, String.class)
+        .createMock();
+    dispatch.setAuthProxyHeaderName(testAuthProxyHeaderName);
+
+    HttpServletRequest inboundRequest = EasyMock.createNiceMock(HttpServletRequest.class);
+    EasyMock.expect(inboundRequest.getHeaderNames()).andReturn(Collections.emptyEnumeration()).anyTimes();
+
+    HttpUriRequest outboundRequest = new HttpGet();
+
+    dispatch.addCredentialsToRequest(EasyMock.eq(outboundRequest), EasyMock.eq(testAuthProxyHeaderName));
+    EasyMock.expectLastCall().once();
+
+    EasyMock.replay(inboundRequest, dispatch);
+
+    dispatch.copyRequestHeaderFields(outboundRequest, inboundRequest);
+
+    EasyMock.verify(inboundRequest, dispatch);
+  }
 }
