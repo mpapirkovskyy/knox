@@ -17,8 +17,12 @@
  */
 package org.apache.knox.gateway.dispatch;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.knox.gateway.config.Configure;
 import org.apache.knox.gateway.config.Default;
+import org.apache.knox.gateway.security.SubjectUtils;
+
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -38,6 +42,7 @@ public class ConfigurableDispatch extends DefaultDispatch {
   private Set<String> requestExcludeHeaders = super.getOutboundRequestExcludeHeaders();
   private Set<String> responseExcludeHeaders = super.getOutboundResponseExcludeHeaders();
   private Boolean removeUrlEncoding = false;
+  private String authProxyHeaderName = "";
 
   private Set<String> handleCommaSeparatedHeaders(String headers) {
     if(headers != null) {
@@ -65,6 +70,11 @@ public class ConfigurableDispatch extends DefaultDispatch {
     this.removeUrlEncoding = Boolean.parseBoolean(removeUrlEncoding);
   }
 
+  @Configure
+  protected void setAuthProxyHeaderName(@Default("") String authProxyHeaderName) {
+    this.authProxyHeaderName = authProxyHeaderName;
+  }
+
   @Override
   public Set<String> getOutboundResponseExcludeHeaders() {
     return responseExcludeHeaders;
@@ -77,6 +87,10 @@ public class ConfigurableDispatch extends DefaultDispatch {
 
   public boolean getRemoveUrlEncoding() {
     return removeUrlEncoding;
+  }
+
+  public String getAuthProxyHeaderName() {
+    return authProxyHeaderName;
   }
 
   @Override
@@ -100,5 +114,21 @@ public class ConfigurableDispatch extends DefaultDispatch {
     }
 
     return super.getDispatchUrl(request);
+  }
+
+  @Override
+  public void copyRequestHeaderFields(HttpUriRequest outboundRequest, HttpServletRequest inboundRequest) {
+    super.copyRequestHeaderFields(outboundRequest, inboundRequest);
+    String headerName = getAuthProxyHeaderName();
+    if (StringUtils.isNotEmpty(headerName)) {
+      addCredentialsToRequest(outboundRequest, headerName);
+    }
+  }
+
+  public void addCredentialsToRequest(HttpUriRequest request, String headerName) {
+    String principal = SubjectUtils.getCurrentEffectivePrincipalName();
+    if (principal != null) {
+      request.addHeader(headerName, principal);
+    }
   }
 }
